@@ -1,7 +1,7 @@
 module.exports = {
     signUp: async (req, res, next) => {
         try {
-            console.log('signUp function called');
+            console.log('reques body', req.value.body);
         } catch(error) {
             next(error);
         }
