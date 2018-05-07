@@ -4,23 +4,16 @@ module.exports = {
     signUp: async (req, res, next) => {
         try {
             const { email, password } = req.value.body;
-            let foundUser;
             // check if there is a user with the same email
-            let user = await knex.select().from('users').where('email', email)
-            if(user[0] !== undefined) {
-                foundUser = user[0].email;
-            }
+            const foundUser = await knex.select().from('users').where('email', email).first();
 
-            if(!foundUser) {
-                // create user
-                await knex('users').insert({ email, password });
-                // respond with a token
-                // res.json({ user: 'created!' });
-                console.log('User Created Successfully! 👍');
-            } else {
-                // res.json({ email: 'already exist' });
-                console.log('User already exist');
-            }
+            if(foundUser) { return res.json({ email: 'already exist' }) };
+            
+            // create user
+            await knex('users').insert({ email, password });
+            // respond with a token
+            res.json({ user: 'created!' });
+            // console.log('User Created Successfully! 👍');
             
         } catch(error) {
             next(error);
