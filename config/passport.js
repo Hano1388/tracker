@@ -2,6 +2,7 @@ const passport       = require('passport'),
       JwtStrategy    = require('passport-jwt').Strategy,
       { ExtractJwt}  = require('passport-jwt'),
       LocalStrategy  = require('passport-local').Strategy,
+      bcrypt         = require('bcryptjs'),
       { JWT_SECRET } = require('./index'),
       knex           = require('../db/knex');
 
@@ -11,6 +12,12 @@ findUserById = id => {
 
 findUserByEmail = email => {
     return knex.select().from('users').where('email', email).first();
+};
+
+isValidPassword = (userPassword, databasePassword) => {
+    console.log('userPassword: ', userPassword);
+    console.log('databasePassword: ', databasePassword);
+    return bcrypt.compare(userPassword, databasePassword);
 }
 
 // JSON WEB TOKENS STRATEGY
@@ -35,13 +42,21 @@ passport.use(new JwtStrategy({
 passport.use(new LocalStrategy({
     usernameField: 'email'
 }, async (email, password, done) => {
-    // Find the user given the email
-    const user = await findUserByEmail(email);
-    // If not, handle it 
-    if (!user) { return done(null, false) };
-    // Check if the password is correct
-
-    // If not, handle it
-
-    // Otherwise, return the user
+    try {
+        // Find the user given the email
+        console.log('user email: ', email);
+        const user = await findUserByEmail(email.toLocaleLowerCase());
+        console.log('user: ', user);
+        // If not, handle it 
+        if(!user) { return done(null, false) };
+        // Check if the password is correct
+        const isMatch = await isValidPassword(password, user.password);
+        console.log('isMatch: ', isMatch);
+        // If not, handle it
+        if(!isMatch) { return done(null, false) };
+        // Otherwise, return the user
+        done(null, user);
+    } catch(error) {
+        done(error, false);
+    }
 }));

@@ -20,8 +20,8 @@ module.exports = {
     signUp: async (req, res, next) => {
         try {
             let { email, password } = req.value.body;
-            const salt = bcrypt.genSaltSync(10);
-            const hash = bcrypt.hashSync(password, salt);
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(password, salt);
             // check if there is a user with the same email
             email = email.toLowerCase();
             const foundUser = await findUserByEmail(email);
@@ -42,7 +42,7 @@ module.exports = {
 
     signIn: async (req, res, next) => {
         try {
-            console.log('signIn function called');
+            console.log('successful login!');
         } catch(error) {
             next(error);
         }
