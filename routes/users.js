@@ -5,13 +5,17 @@ const express                   = require('express'),
        UsersController          = require('../controllers/users'),
        { validateBody, schemas } = require('../helpers/routeHelpers');
 
+const serverValidation    = validateBody(schemas.authSchema),
+      localAuthentication = passport.authenticate('local', { session: false }),
+      jwtAuthentication   = passport.authenticate('jwt', { session: false });
+
 router.route('/signup')
-      .post(validateBody(schemas.authSchema), UsersController.signUp);
+      .post(serverValidation, UsersController.signUp);
 
 router.route('/signin')
-      .post(validateBody(schemas.authSchema), passport.authenticate('local', { session: false }), UsersController.signIn);
+      .post(serverValidation, localAuthentication, UsersController.signIn);
 
 router.route('/secret')
-      .get(passport.authenticate('jwt', { session: false }), UsersController.secret);
+      .get(jwtAuthentication, UsersController.secret);
 
 module.exports = router;

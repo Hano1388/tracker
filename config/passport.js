@@ -6,6 +6,7 @@ const passport       = require('passport'),
       { JWT_SECRET } = require('./index'),
       knex           = require('../db/knex');
 
+//  CUSTOM METHODS
 findUserById = id => {
     return knex.select().from('users').where('id', id).first();
 };

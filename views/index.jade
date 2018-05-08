@@ -3,3 +3,21 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  h4 The API has built using the following technologies: 
+  ul
+    li NodeJS
+    li ExpressJS
+    li passport, bcrypt, passport-jwt (JSON WEB TOKEN) to generate web tokens
+    li PostgreSQL
+    li knexJS to deal with database
+  h4 It has the following api enpoints:
+  ul
+    li
+      a(href="http://localhost:3000/users/signup") sign up
+    li
+      a(href="http://localhost:3000/users/signin") sign in
+    li 
+      a(href="http://localhost:3000/users/secret") secrets
+  
+  h3 Feel free to get a clone at : 
+    a(href="https://github.com/Hano1388/tracker") github.com/Hano1388
