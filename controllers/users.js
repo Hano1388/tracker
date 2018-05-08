@@ -1,10 +1,11 @@
 const JWT            = require('jsonwebtoken'),
+      bcrypt         = require('bcryptjs'),
       knex           = require('../db/knex'),
       { JWT_SECRET } = require('../config');
 
 findUserByEmail = email => {
     return knex.select().from('users').where('email', email).first();
-}
+};
 
 signToken = user => {
     return JWT.sign({
@@ -19,6 +20,8 @@ module.exports = {
     signUp: async (req, res, next) => {
         try {
             let { email, password } = req.value.body;
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(password, salt);
             // check if there is a user with the same email
             email = email.toLowerCase();
             const foundUser = await findUserByEmail(email);
@@ -26,7 +29,7 @@ module.exports = {
             if(foundUser) { return res.json({ email: 'already exist' }) };
 
             // create user
-            await knex('users').insert({ email, password });
+            await knex('users').insert({ email, password: hash });
             // respond with a token
             const user = await findUserByEmail(email);
             const token = await signToken(user);
