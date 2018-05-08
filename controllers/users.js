@@ -1,19 +1,35 @@
-const knex = require('../db/knex');
+const JWT  = require('jsonwebtoken'),
+      knex = require('../db/knex');
+
+findUserByEmail = email => {
+    return knex.select().from('users').where('email', email).first();
+}
+
+signToken = user => {
+    return JWT.sign({
+        iss: 'youtuber',
+        sub: user.id,
+        iat: new Date().getTime(),
+        exp: new Date().setDate(new Date().getDate() + 1)
+    }, 'youruberauthentication');
+}
 
 module.exports = {
     signUp: async (req, res, next) => {
         try {
-            const { email, password } = req.value.body;
+            let { email, password } = req.value.body;
             // check if there is a user with the same email
-            const foundUser = await knex.select().from('users').where('email', email).first();
+            email = email.toLowerCase();
+            const foundUser = await findUserByEmail(email);
 
             if(foundUser) { return res.json({ email: 'already exist' }) };
-            
+
             // create user
             await knex('users').insert({ email, password });
             // respond with a token
-            res.json({ user: 'created!' });
-            // console.log('User Created Successfully! 👍');
+            const user = await findUserByEmail(email);
+            const token = await signToken(user);
+            res.status(200).json({ token });
             
         } catch(error) {
             next(error);
