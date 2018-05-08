@@ -1,5 +1,6 @@
-const JWT  = require('jsonwebtoken'),
-      knex = require('../db/knex');
+const JWT            = require('jsonwebtoken'),
+      knex           = require('../db/knex'),
+      { JWT_SECRET } = require('../config');
 
 findUserByEmail = email => {
     return knex.select().from('users').where('email', email).first();
@@ -11,7 +12,7 @@ signToken = user => {
         sub: user.id,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getDate() + 1)
-    }, 'youruberauthentication');
+    }, JWT_SECRET);
 }
 
 module.exports = {
@@ -46,7 +47,8 @@ module.exports = {
 
     secret: async(req, res, next) => {
         try {
-            console.log('secret function called');
+            console.log('I managed to get here!');
+            res.json({ secret: 'resources' });
         } catch (error) {
             next(error);
         }

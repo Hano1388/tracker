@@ -1,15 +1,17 @@
 const express                   = require('express'),
        router                   = express.Router(),
-       usersController          = require('../controllers/users'),
+       passport                 = require('passport'),
+       passportConfig           = require('../config/passport');
+       UsersController          = require('../controllers/users'),
        { validateBody, schemas } = require('../helpers/routeHelpers');
 
 router.route('/signup')
-      .post(validateBody(schemas.authSchema), usersController.signUp);
+      .post(validateBody(schemas.authSchema), UsersController.signUp);
 
 router.route('/signin')
-      .post(usersController.signIn);
+      .post(UsersController.signIn);
 
 router.route('/secret')
-      .get(usersController.secret);
+      .get(passport.authenticate('jwt', { session: false }), UsersController.secret);
 
 module.exports = router;
